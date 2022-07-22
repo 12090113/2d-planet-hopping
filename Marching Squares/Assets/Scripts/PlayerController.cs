@@ -4,8 +4,12 @@ public class PlayerController : MonoBehaviour
 {
     Planet planet;
     Rigidbody2D rb;
+    //private new Collider2D collider;
     bool input = true;
     const float G = 0.001f;
+    public float speed = 3;
+    public bool grounded = false;
+    public int jumped = 0;
 
     private float targetAngle = 0f; // the desired angle
     private float curAngle; // current angle
@@ -21,7 +25,7 @@ public class PlayerController : MonoBehaviour
     {
         planet = FindObjectOfType<Planet>();
         rb = GetComponent<Rigidbody2D>();
-        rb.angularVelocity = 0.01f;
+        //collider = GetComponent<Collider2D>();
 
         targetAngle = transform.eulerAngles.z; // get the current angle just for start
         curAngle = targetAngle;
@@ -30,20 +34,36 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         AlignWith(planet.transform);
-
-        if (input)
+        if (grounded)
         {
-            if (Input.GetKey(KeyCode.W))
+            if (input)
             {
-                rb.AddForce(transform.up * 1);
+                if (jumped <= 0)
+                {
+                    if (Input.GetKey(KeyCode.W))
+                    {
+                        rb.AddForce(transform.up * 200);
+                        jumped = 50;
+                    }
+                } else
+                {
+                    jumped -= 1;
+                }
+                
+                if (Input.GetKey(KeyCode.D))
+                {
+                    rb.AddForce(transform.right * speed);
+                }
+                else if (Input.GetKey(KeyCode.A))
+                {
+                    rb.AddForce(transform.right * -speed);
+                }
             }
-            if (Input.GetKey(KeyCode.D))
+        } else
+        {
+            if (jumped > 0)
             {
-                rb.AddForce(transform.right * 1);
-            }
-            else if (Input.GetKey(KeyCode.A))
-            {
-                rb.AddForce(transform.right * -1);
+                jumped -= 3;
             }
         }
         float dist = Vector3.Distance(transform.position, planet.transform.position);
@@ -51,6 +71,20 @@ public class PlayerController : MonoBehaviour
         Vector3 dir = planet.transform.position - transform.position;
         rb.AddForce(g * dir);
     }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        grounded = true;
+    }
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        grounded = true;
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        grounded = false;
+    }
+
     void AlignWith(Transform target)
     {
         targetAngle = Mathf.Atan2(planet.transform.position.y - transform.position.y, planet.transform.position.x - transform.position.x) * Mathf.Rad2Deg + 90;
