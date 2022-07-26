@@ -72,6 +72,8 @@ public class NBodySimulation : MonoBehaviour
         for (int i = 0; i < bodies.Length; i++)
         {
             bodiesrb[i].AddForce(new Vector2(force_data[i * 3], force_data[i * 3 + 1]));
+            if (bodies[i].alignWithGravity)
+                bodies[i].AlignWith(new Vector2(force_data[i * 3], force_data[i * 3 + 1]));
             Vector3 pos = bodies[i].transform.position;
             pos_data[i * 3 + 0] = pos.x;
             pos_data[i * 3 + 1] = pos.y;

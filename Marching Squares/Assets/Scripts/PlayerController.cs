@@ -33,7 +33,7 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        AlignWith(planet);
+        //AlignWith(planet);
         if (grounded)
         {
             if (input)
