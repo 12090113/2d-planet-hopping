@@ -1640,11 +1640,11 @@ GameObject:
   m_Component:
   - component: {fileID: 1609055989}
   - component: {fileID: 1609055988}
-  - component: {fileID: 1609055987}
   - component: {fileID: 1609055990}
   - component: {fileID: 1609055991}
   - component: {fileID: 1609055992}
   - component: {fileID: 1609055993}
+  - component: {fileID: 1609055994}
   m_Layer: 0
   m_Name: Planet
   m_TagString: Untagged
@@ -1652,20 +1652,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1609055987
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1609055986}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba01384019f2c854885168dec84d8617, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mass: 100000
-  radius: 25
 --- !u!212 &1609055988
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1816,7 +1802,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1000
+  m_Mass: 100000
   m_LinearDrag: 0
   m_AngularDrag: 0
   m_GravityScale: 1
@@ -1825,6 +1811,20 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1609055994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1609055986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 082613a4d2deaaf48a30de02540245fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  velocity: {x: 0, y: 0, z: 0}
+  mass: 100000
 --- !u!43 &1678404410
 Mesh:
   m_ObjectHideFlags: 0
@@ -2003,6 +2003,7 @@ GameObject:
   - component: {fileID: 1758065224}
   - component: {fileID: 1758065223}
   - component: {fileID: 1758065225}
+  - component: {fileID: 1758065226}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -2089,6 +2090,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96e6c52d939ccaa428367be84fb65ad1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  planet: {fileID: 1609055989}
   speed: 5
   grounded: 0
   jumped: 0
@@ -2145,6 +2147,65 @@ CircleCollider2D:
   m_Offset: {x: 0, y: -0.6}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &1758065226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1758065219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 082613a4d2deaaf48a30de02540245fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  velocity: {x: 0, y: 0, z: 0}
+  mass: 1
+--- !u!1 &1814419777
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1814419779}
+  - component: {fileID: 1814419778}
+  m_Layer: 0
+  m_Name: NbodySim
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1814419778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1814419777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2082d2002a877b146849d065ac7768c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shader: {fileID: 7200000, guid: 7cfdf8d3c89481d4a92d70d77f5aaddc, type: 3}
+--- !u!4 &1814419779
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1814419777}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 21.063229, y: 6.0593677, z: -0.018267058}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1880793630
 GameObject:
   m_ObjectHideFlags: 0

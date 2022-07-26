@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    Planet planet;
+    public Transform planet;
     Rigidbody2D rb;
     //private new Collider2D collider;
     bool input = true;
-    const float G = 0.001f;
+    //const float G = 0.001f;
     public float speed = 3;
     public bool grounded = false;
     public int jumped = 0;
@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        planet = FindObjectOfType<Planet>();
+        //planet = FindObjectOfType<GravityObject>().transform;
         rb = GetComponent<Rigidbody2D>();
         //collider = GetComponent<Collider2D>();
 
@@ -33,7 +33,7 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        AlignWith(planet.transform);
+        AlignWith(planet);
         if (grounded)
         {
             if (input)
@@ -66,10 +66,10 @@ public class PlayerController : MonoBehaviour
                 jumped -= 3;
             }
         }
-        float dist = Vector3.Distance(transform.position, planet.transform.position);
-        float g = G * planet.mass / (dist * dist);
-        Vector3 dir = planet.transform.position - transform.position;
-        rb.AddForce(g * dir);
+        //float dist = Vector3.Distance(transform.position, planet.position);
+        //float g = G * planet.mass / (dist * dist);
+        //Vector3 dir = planet.position - transform.position;
+        //rb.AddForce(g * dir);
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -87,7 +87,7 @@ public class PlayerController : MonoBehaviour
 
     void AlignWith(Transform target)
     {
-        targetAngle = Mathf.Atan2(planet.transform.position.y - transform.position.y, planet.transform.position.x - transform.position.x) * Mathf.Rad2Deg + 90;
+        targetAngle = Mathf.Atan2(planet.position.y - transform.position.y, planet.position.x - transform.position.x) * Mathf.Rad2Deg + 90;
         var error = Mathf.DeltaAngle(curAngle, targetAngle); // generate the error signal
         var diff = (error - lastError) / Time.fixedDeltaTime; // calculate differential error
         lastError = error;
