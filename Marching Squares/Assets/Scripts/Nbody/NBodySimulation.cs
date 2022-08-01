@@ -53,6 +53,7 @@ public class NBodySimulation : MonoBehaviour
             force_data[i * 3 + 0] = force_data[i * 3 + 1] = force_data[i * 3 + 2] = 0;
             bodiesrb[i] = bodies[i].GetComponent<Rigidbody2D>();
             bodiesrb[i].mass = bodies[i].mass;
+            Debug.Log(bodies[i].name + ": mass= " + bodies[i].mass + ", rb mass= " + bodiesrb[i].mass);
             bodiesrb[i].velocity = bodies[i].velocity;
         }
         pos_buf.SetData(pos_data);

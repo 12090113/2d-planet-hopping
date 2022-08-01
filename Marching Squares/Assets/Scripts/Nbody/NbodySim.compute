@@ -10,7 +10,7 @@ uint num;
 [numthreads(64,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-	float G = 0.035;
+	float G = 0.1;
 	float3 t_force = float3(0.0f, 0.0f, 0.0f);
 	float g;
 	uint threadnum = id.x + id.y * 64;
@@ -18,7 +18,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 	for (uint i = 0; i < num; i++)
 	{
 		float dist = distance(position[i], position[threadnum]);
-		g = (mass[i] + mass[threadnum]) / (dist * dist) * G;
+		g = (mass[i] * mass[threadnum]) / (dist * dist) * G;
 
 		// Direction vector. We add 1e-10 to avoid NaN when length == 0
 		float3 dir = position[i] - position[threadnum];

@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour
                 {
                     if (Input.GetKey(KeyCode.W))
                     {
-                        rb.AddForce(transform.up * 200);
+                        rb.AddForce(transform.up * 500);
                         jumped = 50;
                     }
                 } else

@@ -22,7 +22,7 @@ public class CameraController : MonoBehaviour
     }
     void FixedUpdate()
     {
-        transform.position = Vector3.Lerp(transform.position, target.position + offset, speed);
+        transform.position = target.position + offset;//Vector3.Lerp(transform.position, target.position + offset, speed);
         transform.rotation = Quaternion.Lerp(transform.rotation, target.rotation, rotspeed);
     }
 
