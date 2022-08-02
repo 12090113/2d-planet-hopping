@@ -4,7 +4,7 @@ public class CameraController : MonoBehaviour
 {
     private Transform player;
     private Transform target;
-    private float speed = 0.125f;
+    //private float speed = 0.125f;
     private float rotspeed = 0.125f;
     public Vector3 offset = new Vector3(0, 0, -10);
     public float scrollSpeed = 0.1f;

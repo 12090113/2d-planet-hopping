@@ -21,7 +21,7 @@ public class GravityObject : MonoBehaviour
     public void AlignWith(Vector2 target)
     {
         targetAngle = Mathf.Atan2(target.y, target.x) * Mathf.Rad2Deg + 90;//Vector2.Angle(Vector2.,target); //Mathf.Atan2(planet.position.y - transform.position.y, planet.position.x - transform.position.x) * Mathf.Rad2Deg + 90;
-        Debug.Log(target + ": " + targetAngle);
+        //Debug.Log("(" + target.x + ", " + target.y + "): " + targetAngle);
         var error = Mathf.DeltaAngle(curAngle, targetAngle); // generate the error signal
         var diff = (error - lastError) / Time.fixedDeltaTime; // calculate differential error
         lastError = error;

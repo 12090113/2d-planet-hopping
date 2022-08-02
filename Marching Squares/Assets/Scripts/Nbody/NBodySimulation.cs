@@ -13,7 +13,7 @@ public class NBodySimulation : MonoBehaviour
     public static ComputeBuffer pos_buf;
     //public static ComputeBuffer vel_buf;
     public static ComputeBuffer mass_buf;
-    public static ComputeBuffer force_buf;
+    public static ComputeBuffer accel_buf;
 
     void Awake()
     {
@@ -27,18 +27,18 @@ public class NBodySimulation : MonoBehaviour
         pos_buf = new ComputeBuffer(threads, 3 * sizeof(float));
         //vel_buf = new ComputeBuffer(threads, 3 * sizeof(float));
         mass_buf = new ComputeBuffer(threads, sizeof(float));
-        force_buf = new ComputeBuffer(threads, 3 * sizeof(float));
+        accel_buf = new ComputeBuffer(threads, 3 * sizeof(float));
 
         // These global buffers apply to every shader with these buffers defined.
         Shader.SetGlobalBuffer(Shader.PropertyToID("position"), pos_buf);
         //Shader.SetGlobalBuffer(Shader.PropertyToID("velocity"), vel_buf);
         Shader.SetGlobalBuffer(Shader.PropertyToID("mass"), mass_buf);
-        Shader.SetGlobalBuffer(Shader.PropertyToID("force"), force_buf);
+        Shader.SetGlobalBuffer(Shader.PropertyToID("accel"), accel_buf);
 
         float[] pos_data = new float[threads * 3];
         //float[] vel_data = new float[threads * 3];
         float[] mass_data = new float[threads];
-        float[] force_data = new float[threads * 3];
+        float[] accel_data = new float[threads * 3];
         Debug.Log(bodies.Length);
         Debug.Log(threads);
         for (int i = 0; i < bodies.Length; i++)
@@ -50,7 +50,7 @@ public class NBodySimulation : MonoBehaviour
             //vel_data[i * 3 + 1] = bodies[i].velocity.y;
             //vel_data[i * 3 + 2] = bodies[i].velocity.z;
             mass_data[i] = bodies[i].mass;
-            force_data[i * 3 + 0] = force_data[i * 3 + 1] = force_data[i * 3 + 2] = 0;
+            accel_data[i * 3 + 0] = accel_data[i * 3 + 1] = accel_data[i * 3 + 2] = 0;
             bodiesrb[i] = bodies[i].GetComponent<Rigidbody2D>();
             bodiesrb[i].mass = bodies[i].mass;
             Debug.Log(bodies[i].name + ": mass= " + bodies[i].mass + ", rb mass= " + bodiesrb[i].mass);
@@ -59,7 +59,7 @@ public class NBodySimulation : MonoBehaviour
         pos_buf.SetData(pos_data);
         //vel_buf.SetData(vel_data);
         mass_buf.SetData(mass_data);
-        force_buf.SetData(force_data);
+        accel_buf.SetData(accel_data);
         shader.SetInt("num", bodies.Length);
     }
 
@@ -68,13 +68,13 @@ public class NBodySimulation : MonoBehaviour
         shader.Dispatch(shader.FindKernel("CSMain"), 1, threads/64, 1);
 
         float[] pos_data = new float[threads * 3];
-        float[] force_data = new float[threads * 3];
-        force_buf.GetData(force_data);
+        float[] accel_data = new float[threads * 3];
+        accel_buf.GetData(accel_data);
         for (int i = 0; i < bodies.Length; i++)
         {
-            bodiesrb[i].AddForce(new Vector2(force_data[i * 3], force_data[i * 3 + 1]));
+            bodiesrb[i].velocity += new Vector2(accel_data[i * 3], accel_data[i * 3 + 1]) * Time.fixedDeltaTime;
             if (bodies[i].alignWithGravity)
-                bodies[i].AlignWith(new Vector2(force_data[i * 3], force_data[i * 3 + 1]));
+                bodies[i].AlignWith(new Vector2(accel_data[i * 3], accel_data[i * 3 + 1]));
             Vector3 pos = bodies[i].transform.position;
             pos_data[i * 3 + 0] = pos.x;
             pos_data[i * 3 + 1] = pos.y;
@@ -88,6 +88,6 @@ public class NBodySimulation : MonoBehaviour
         pos_buf.Dispose();
         //vel_buf.Dispose();
         mass_buf.Dispose();
-        force_buf.Dispose();
+        accel_buf.Dispose();
     }
 }
