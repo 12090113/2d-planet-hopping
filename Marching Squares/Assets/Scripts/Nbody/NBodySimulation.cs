@@ -7,6 +7,7 @@ public class NBodySimulation : MonoBehaviour
     GravityObject[] bodies;
     Rigidbody2D[] bodiesrb;
     //static NBodySimulation instance;
+    public float timeStep = 0.02f;
 
     int threads = 1;
     public ComputeShader shader;
@@ -72,7 +73,7 @@ public class NBodySimulation : MonoBehaviour
         accel_buf.GetData(accel_data);
         for (int i = 0; i < bodies.Length; i++)
         {
-            bodiesrb[i].velocity += new Vector2(accel_data[i * 3], accel_data[i * 3 + 1]) * Time.fixedDeltaTime;
+            bodiesrb[i].velocity += new Vector2(accel_data[i * 3], accel_data[i * 3 + 1]) * timeStep;
             if (bodies[i].alignWithGravity)
                 bodies[i].AlignWith(new Vector2(accel_data[i * 3], accel_data[i * 3 + 1]));
             Vector3 pos = bodies[i].transform.position;
