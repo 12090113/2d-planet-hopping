@@ -5,7 +5,7 @@ using UnityEngine;
 public class Atmosphere : MonoBehaviour
 {
     Rigidbody2D rb;
-    const float drag = 0.1f;
+    const float drag = 10f;
     List<Rigidbody2D> rbs = new();
     // Start is called before the first frame update
     void Start()
@@ -18,9 +18,11 @@ public class Atmosphere : MonoBehaviour
     {
         foreach (Rigidbody2D obj in rbs)
         {
-            //Debug.Log(collision.name);
+            float dist = Vector2.Distance(transform.position, obj.position);
+            float dragcof = 1 / dist;
+            Debug.Log(obj.name + ": " + dragcof);
             Vector2 relativeVelocity = rb.velocity - obj.velocity;
-            Vector2 vector = relativeVelocity.sqrMagnitude * relativeVelocity.normalized * drag;
+            Vector2 vector = relativeVelocity.sqrMagnitude * relativeVelocity.normalized * drag * dragcof;
             float num = Mathf.Min(vector.magnitude * Time.fixedDeltaTime, relativeVelocity.magnitude);
             obj.velocity += relativeVelocity.normalized * num;
         }
@@ -45,6 +47,6 @@ public class Atmosphere : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log(collision.gameObject.name);
+        //Debug.Log(collision.gameObject.name);
     }
 }
