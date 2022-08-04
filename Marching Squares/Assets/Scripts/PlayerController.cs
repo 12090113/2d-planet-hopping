@@ -4,6 +4,7 @@ public class PlayerController : MonoBehaviour
 {
     public Transform planet;
     Rigidbody2D rb;
+    GravityObject gravObj;
     //private new Collider2D collider;
     bool input = true;
     //const float G = 0.001f;
@@ -26,6 +27,7 @@ public class PlayerController : MonoBehaviour
     {
         //planet = FindObjectOfType<GravityObject>().transform;
         rb = GetComponent<Rigidbody2D>();
+        gravObj = GetComponent<GravityObject>();
         //collider = GetComponent<Collider2D>();
 
         targetAngle = transform.eulerAngles.z; // get the current angle just for start
@@ -37,37 +39,53 @@ public class PlayerController : MonoBehaviour
         //AlignWith(planet);
         //if (grounded)
         //{
-            if (input)
+        if (input)
+        {
+            if (jumped <= 0)
             {
-                if (jumped <= 0)
+                if (Input.GetKey(KeyCode.W))
                 {
-                    if (Input.GetKey(KeyCode.W))
-                    {
-                        rb.AddForce(transform.up * 500);
-                        jumped = 50;
-                    }
-                } else
-                {
-                    jumped -= 1;
+                    rb.AddForce(transform.up * 500);
+                    jumped = 50;
                 }
-                
-                if (Input.GetKey(KeyCode.D))
-                {
-                    rb.AddForce(transform.right * speed);
-                }
-                else if (Input.GetKey(KeyCode.A))
-                {
-                    rb.AddForce(transform.right * -speed);
-                }
+            }
+            else
+            {
+                jumped -= 1;
+            }
+
+            if (Input.GetKey(KeyCode.D))
+            {
+                rb.AddForce(transform.right * speed);
+            }
+            else if (Input.GetKey(KeyCode.A))
+            {
+                rb.AddForce(transform.right * -speed);
+            }
+            if (!gravObj.alignWithGravity)
+            {
                 if (Input.GetKey(KeyCode.Q))
                 {
-                rb.AddTorque(rotation * 1);
+                    rb.AddTorque(rotation * 1);
                 }
                 else if (Input.GetKey(KeyCode.E))
                 {
-                rb.AddTorque(rotation * -1);
+                    rb.AddTorque(rotation * -1);
+                }
+                else if (rb.angularVelocity < -12)
+                {
+                    rb.AddTorque(rotation);
+                }
+                else if (rb.angularVelocity > 12)
+                {
+                    rb.AddTorque(-rotation);
+                }
+                else
+                {
+                    rb.angularVelocity = 0;
                 }
             }
+        }
         //} else
         //{
            // if (jumped > 0)
