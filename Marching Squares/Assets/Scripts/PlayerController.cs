@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     public float speed = 3;
     public bool grounded = false;
     public int jumped = 0;
+    public float rotation = 1;
 
     private float targetAngle = 0f; // the desired angle
     private float curAngle; // current angle
@@ -34,8 +35,8 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         //AlignWith(planet);
-        if (grounded)
-        {
+        //if (grounded)
+        //{
             if (input)
             {
                 if (jumped <= 0)
@@ -58,14 +59,22 @@ public class PlayerController : MonoBehaviour
                 {
                     rb.AddForce(transform.right * -speed);
                 }
+                if (Input.GetKey(KeyCode.Q))
+                {
+                rb.AddTorque(rotation * 1);
+                }
+                else if (Input.GetKey(KeyCode.E))
+                {
+                rb.AddTorque(rotation * -1);
+                }
             }
-        } else
-        {
-            if (jumped > 0)
-            {
-                jumped -= 3;
-            }
-        }
+        //} else
+        //{
+           // if (jumped > 0)
+           // {
+              //  jumped -= 3;
+            //}
+        //}
         //float dist = Vector3.Distance(transform.position, planet.position);
         //float g = G * planet.mass / (dist * dist);
         //Vector3 dir = planet.position - transform.position;
@@ -73,7 +82,16 @@ public class PlayerController : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        grounded = true;
+        Debug.Log(collision.name);
+        if (collision.name.Equals("Player"))
+        {
+            grounded = true;
+        }
+        else
+        {
+            
+        }
+        
     }
     private void OnTriggerStay2D(Collider2D collision)
     {
@@ -85,9 +103,9 @@ public class PlayerController : MonoBehaviour
         grounded = false;
     }
 
-    void AlignWith(Transform target)
+    public void AlignWith(Transform target)
     {
-        targetAngle = Mathf.Atan2(planet.position.y - transform.position.y, planet.position.x - transform.position.x) * Mathf.Rad2Deg + 90;
+        targetAngle = target.transform.rotation.eulerAngles.z;
         var error = Mathf.DeltaAngle(curAngle, targetAngle); // generate the error signal
         var diff = (error - lastError) / Time.fixedDeltaTime; // calculate differential error
         lastError = error;
