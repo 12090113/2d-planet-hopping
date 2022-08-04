@@ -7,8 +7,9 @@ public class Atmosphere : MonoBehaviour
     Rigidbody2D rb;
     CircleCollider2D col;
     float radius = 1;
-    public float drag = 0.01f;
-    List<Rigidbody2D> rbs = new();
+    public float drag = 0.1f;
+    //List<(bool,Rigidbody2D)> rbs = new();
+    Dictionary<Rigidbody2D, bool> rbs = new();
     // Start is called before the first frame update
     void Start()
     {
@@ -24,15 +25,15 @@ public class Atmosphere : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        foreach (Rigidbody2D obj in rbs)
+        foreach (var obj in rbs)
         {
-            float dist = Vector2.Distance(transform.position, obj.position);
+            float dist = Vector2.Distance(transform.position, obj.Key.position);
             float dragcof = 1 - dist / radius;
-            Debug.Log(obj.name + ": " + dist + " / " + radius + " = " + dragcof);
-            Vector2 relativeVelocity = rb.velocity - obj.velocity;
+            Debug.Log(obj.Key.name + ": " + dist + " / " + radius + " = " + dragcof);
+            Vector2 relativeVelocity = rb.velocity - obj.Key.velocity;
             Vector2 vector = relativeVelocity.sqrMagnitude * relativeVelocity.normalized * drag * dragcof;
             float num = Mathf.Min(vector.magnitude * Time.fixedDeltaTime, relativeVelocity.magnitude);
-            obj.velocity += relativeVelocity.normalized * num;
+            obj.Key.velocity += relativeVelocity.normalized * num;
         }
     }
 
@@ -41,7 +42,7 @@ public class Atmosphere : MonoBehaviour
         Rigidbody2D rbother = collision.attachedRigidbody;
         if (rbother != null)
         {
-            rbs.Add(rbother);
+            rbs.Add(rbother, false);
         }
     }
     private void OnTriggerExit2D(Collider2D collision)
@@ -55,6 +56,10 @@ public class Atmosphere : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        //Debug.Log(collision.gameObject.name);
+        //Rigidbody2D rbother = collision.otherRigidbody;
+        //if (rbs.TryGetValue(rbother, out bool value))
+        //{
+        //    value = true;
+        //}
     }
 }
