@@ -69,11 +69,12 @@ public class OrbitDebugDisplay : MonoBehaviour {
 
         // Draw paths
         for (int bodyIndex = 0; bodyIndex < virtualBodies.Length; bodyIndex++) {
-            var pathColour = Color.red; //bodies[bodyIndex].gameObject.GetComponentInChildren<MeshRenderer> ().sharedMaterial.color; //
-            if (bodies[bodyIndex].name.Equals("Player"))
-            {
-                pathColour = Color.black;
-            }
+            Random.InitState(bodies[bodyIndex].GetHashCode());
+            Color pathColour = Random.ColorHSV(0f, 1f, 1f, 1f, 0.75f, 1f);
+            //if (bodies[bodyIndex].name.Equals("Player"))
+            //{
+            //    pathColour = Color.black;
+            //}
 
             if (useThickLines) {
                 var lineRenderer = bodies[bodyIndex].gameObject.GetComponentInChildren<LineRenderer> ();
