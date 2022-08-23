@@ -6,7 +6,7 @@ public class rocketeer : MonoBehaviour
 {
     Rigidbody2D rb;
     public float speed = 3;
-    List<Rigidbody2D> rbs = new();
+    Dictionary<Rigidbody2D, GravityObject> rbs = new();
     PolygonCollider2D col;
 
     // Start is called before the first frame update
@@ -27,18 +27,22 @@ public class rocketeer : MonoBehaviour
         {
             rb.AddForce(transform.up * speed);
         }
-        foreach (Rigidbody2D obj in rbs)
+        foreach (var obj in rbs)
         {
-            obj.GetComponent<PlayerController>()?.AlignWith(transform);
+            obj.Key.GetComponent<PlayerController>()?.AlignWith(transform);
         }
 
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Rigidbody2D rbother = collision.attachedRigidbody;
+        rbother.TryGetComponent(out GravityObject gravObj);
+        //GravityObject gravObj = go;
+        gravObj.alignWithGravity = false;
+        //gravObj = rbother.GetComponent<GravityObject>();
         if (rbother != null)
         {
-            rbs.Add(rbother);
+            rbs.TryAdd(rbother, gravObj);
         }
     }
 

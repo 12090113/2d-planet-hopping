@@ -8,6 +8,7 @@ public class NBodySimulation : MonoBehaviour
     Rigidbody2D[] bodiesrb;
     //static NBodySimulation instance;
     public float timeStep = 0.02f;
+    public bool usePhysicsTimeStep = true;
 
     int threads = 1;
     public ComputeShader shader;
@@ -66,6 +67,8 @@ public class NBodySimulation : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (usePhysicsTimeStep)
+            timeStep = Time.fixedDeltaTime;
         shader.Dispatch(shader.FindKernel("CSMain"), 1, threads/64, 1);
 
         float[] pos_data = new float[threads * 3];

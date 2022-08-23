@@ -100,7 +100,7 @@ public class PlayerController : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log(collision.name);
+        //Debug.Log(collision.name);
         if (collision.name.Equals("Player"))
         {
             grounded = true;

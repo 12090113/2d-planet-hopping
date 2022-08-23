@@ -42,7 +42,7 @@ public class Atmosphere : MonoBehaviour
         Rigidbody2D rbother = collision.attachedRigidbody;
         if (rbother != null)
         {
-            rbs.Add(rbother, false);
+            rbs.TryAdd(rbother, false);
         }
     }
     private void OnTriggerExit2D(Collider2D collision)

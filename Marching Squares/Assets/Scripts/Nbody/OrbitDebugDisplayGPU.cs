@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
-[ExecuteInEditMode]
-public class OrbitDebugDisplay : MonoBehaviour {
+//[ExecuteInEditMode]
+public class OrbitDebugDisplayGPU : MonoBehaviour {
 
     public int numSteps = 1000;
     public float timeStep = 0.1f;
@@ -12,17 +12,25 @@ public class OrbitDebugDisplay : MonoBehaviour {
     public float width = 100;
     public bool useThickLines;
 
+    int threads = 1;
+    public ComputeShader shader;
+    public static ComputeBuffer predpos_buf;
+
     void Start () {
         if (Application.isPlaying) {
-            HideOrbits ();
+            useThickLines = true;
         }
+        Shader.SetGlobalBuffer(Shader.PropertyToID("predpositions"), predpos_buf);
     }
 
     void Update () {
+        //if (!Application.isPlaying) {
+            DrawOrbitsGPU();
+        //}
+    }
 
-        if (!Application.isPlaying) {
-            DrawOrbits ();
-        }
+    void DrawOrbitsGPU() {
+        ;
     }
 
     void DrawOrbits () {
@@ -118,6 +126,8 @@ public class OrbitDebugDisplay : MonoBehaviour {
         // Draw paths
         for (int bodyIndex = 0; bodyIndex < bodies.Length; bodyIndex++) {
             var lineRenderer = bodies[bodyIndex].gameObject.GetComponentInChildren<LineRenderer> ();
+            //if (lineRenderer = null)
+                //lineRenderer = bodies[bodyIndex].gameObject.AddComponent<LineRenderer>();
             lineRenderer.positionCount = 0;
         }
     }
@@ -135,7 +145,10 @@ public class OrbitDebugDisplay : MonoBehaviour {
 
         public VirtualBody (GravityObject body) {
             position = body.transform.position;
-            velocity = body.velocity;
+            if (Application.isPlaying)
+                velocity = body.GetComponent<Rigidbody2D>().velocity;
+            else
+                velocity = body.velocity;
             mass = body.mass;
         }
     }
