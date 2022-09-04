@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     public bool grounded = false;
     public int jumped = 0;
     public float rotation = 1;
+    public float timeSpeed = 1;
 
     private float targetAngle = 0f; // the desired angle
     private float curAngle; // current angle
@@ -97,6 +98,20 @@ public class PlayerController : MonoBehaviour
         //float g = G * planet.mass / (dist * dist);
         //Vector3 dir = planet.position - transform.position;
         //rb.AddForce(g * dir);
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.KeypadPlus))
+        {
+            timeSpeed += 1f;
+            Time.timeScale = timeSpeed;
+        }
+        else if (Input.GetKeyDown(KeyCode.KeypadMinus) && Time.timeScale > 0)
+        {
+            timeSpeed -= 1f;
+            Time.timeScale = timeSpeed;
+        }
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
