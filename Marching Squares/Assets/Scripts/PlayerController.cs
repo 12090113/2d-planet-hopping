@@ -43,20 +43,7 @@ public class PlayerController : MonoBehaviour
         //{
         if (input)
         {
-            
-            if (Input.GetKey(KeyCode.F))
-            {
-                if (jetpack==true)
-                {
-                    jetpack = false;
-                }
-                else
-                {
-                    jetpack = true;
-                }
-            }
-
-            if (jetpack == false)
+            if (!jetpack)
             {
                 if (jumped <= 0)
                 {
@@ -169,6 +156,19 @@ public class PlayerController : MonoBehaviour
         {
             timeSpeed -= 1f;
             Time.timeScale = timeSpeed;
+        }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            if (jetpack)
+            {
+                jetpack = false;
+                gravObj.alignWithGravity = true;
+            }
+            else
+            {
+                jetpack = true;
+                gravObj.alignWithGravity = false;
+            }
         }
     }
     private void OnTriggerEnter2D(Collider2D collision)
