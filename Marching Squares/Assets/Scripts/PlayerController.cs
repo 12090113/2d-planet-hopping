@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     //const float G = 0.001f;
     public float speed = 3;
     public bool grounded = false;
+    public bool jetpack = false;
     public int jumped = 0;
     public float rotation = 1;
     public float timeSpeed = 1;
@@ -42,29 +43,85 @@ public class PlayerController : MonoBehaviour
         //{
         if (input)
         {
-            if (jumped <= 0)
+            
+            if (Input.GetKey(KeyCode.F))
             {
-                if (Input.GetKey(KeyCode.W))
+                if (jetpack==true)
                 {
-                    rb.AddForce(transform.up * 500);
-                    jumped = 50;
+                    jetpack = false;
+                }
+                else
+                {
+                    jetpack = true;
+                }
+            }
+
+            if (jetpack == false)
+            {
+                if (jumped <= 0)
+                {
+                    if (Input.GetKey(KeyCode.W))
+                    {
+                        rb.AddForce(transform.up * 500);
+                        jumped = 50;
+                    }
+                }
+                else
+                {
+                    jumped -= 1;
+                }
+
+                if (Input.GetKey(KeyCode.D))
+                {
+                    rb.AddForce(transform.right * speed);
+                }
+                else if (Input.GetKey(KeyCode.A))
+                {
+                    rb.AddForce(transform.right * -speed);
+                }
+                if (!gravObj.alignWithGravity)
+                {
+                    if (Input.GetKey(KeyCode.Q))
+                    {
+                        rb.AddTorque(rotation * 1);
+                    }
+                    else if (Input.GetKey(KeyCode.E))
+                    {
+                        rb.AddTorque(rotation * -1);
+                    }
+                    else if (rb.angularVelocity < -12)
+                    {
+                        rb.AddTorque(rotation);
+                    }
+                    else if (rb.angularVelocity > 12)
+                    {
+                        rb.AddTorque(-rotation);
+                    }
+                    else
+                    {
+                        rb.angularVelocity = 0;
+                    }
                 }
             }
             else
             {
-                jumped -= 1;
-            }
+                if (Input.GetKey(KeyCode.D))
+                {
+                    rb.AddForce(transform.right * speed);
+                }
+                else if (Input.GetKey(KeyCode.A))
+                {
+                    rb.AddForce(transform.right * -speed);
+                }
+                if (Input.GetKey(KeyCode.W))
+                {
+                    rb.AddForce(transform.up * speed);
+                }
+                else if (Input.GetKey(KeyCode.S))
+                {
+                    rb.AddForce(transform.up * -speed);
+                }
 
-            if (Input.GetKey(KeyCode.D))
-            {
-                rb.AddForce(transform.right * speed);
-            }
-            else if (Input.GetKey(KeyCode.A))
-            {
-                rb.AddForce(transform.right * -speed);
-            }
-            if (!gravObj.alignWithGravity)
-            {
                 if (Input.GetKey(KeyCode.Q))
                 {
                     rb.AddTorque(rotation * 1);
@@ -87,6 +144,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+
         //} else
         //{
            // if (jumped > 0)
