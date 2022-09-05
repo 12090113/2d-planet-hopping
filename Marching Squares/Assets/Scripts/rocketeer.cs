@@ -37,12 +37,10 @@ public class rocketeer : MonoBehaviour
     {
         Rigidbody2D rbother = collision.attachedRigidbody;
         rbother.TryGetComponent(out GravityObject gravObj);
-        //GravityObject gravObj = go;
-        gravObj.alignWithGravity = false;
-        //gravObj = rbother.GetComponent<GravityObject>();
-        if (rbother != null)
+        if (rbother != null && gravObj.alignWithGravity)
         {
             rbs.TryAdd(rbother, gravObj);
+            gravObj.alignWithGravity = false;
         }
     }
 
@@ -51,7 +49,12 @@ public class rocketeer : MonoBehaviour
         Rigidbody2D rbother = collision.attachedRigidbody;
         if (rbother != null)
         {
-            rbs.Remove(rbother);
+            rbs.TryGetValue(rbother, out var obj);
+            if (obj)
+            {
+                obj.alignWithGravity = true;
+                rbs.Remove(rbother);
+            }
         }
     }
 
