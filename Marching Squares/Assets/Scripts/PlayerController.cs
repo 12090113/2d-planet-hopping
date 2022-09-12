@@ -2,9 +2,11 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public Transform planet;
+    private Transform tran;
+    Rigidbody2D playerrb;
     Rigidbody2D rb;
     GravityObject gravObj;
+    public Rigidbody2D ship;
     //private new Collider2D collider;
     bool input = true;
     //const float G = 0.001f;
@@ -24,15 +26,25 @@ public class PlayerController : MonoBehaviour
     private float pGain = 20f; // the proportional gain
     private float dGain = 10f; // differential gain
     private float lastError;
+    public enum InputMode
+    {
+        Ground,
+        Space,
+        Ship
+    }
+    public InputMode inputMode = InputMode.Ground;
+    private InputMode prevInput = InputMode.Ground;
 
     void Start()
     {
-        //planet = FindObjectOfType<GravityObject>().transform;
-        rb = GetComponent<Rigidbody2D>();
+        //planet = FindObjectOfType<GravityObject>().tran;
+        playerrb = GetComponent<Rigidbody2D>();
+        rb = playerrb;
         gravObj = GetComponent<GravityObject>();
+        tran = transform;
         //collider = GetComponent<Collider2D>();
 
-        targetAngle = transform.eulerAngles.z; // get the current angle just for start
+        targetAngle = tran.eulerAngles.z; // get the current angle just for start
         curAngle = targetAngle;
     }
 
@@ -43,13 +55,13 @@ public class PlayerController : MonoBehaviour
         //{
         if (input)
         {
-            if (!jetpack)
+            if (inputMode == InputMode.Ground)
             {
                 if (jumped <= 0)
                 {
                     if (Input.GetKey(KeyCode.W))
                     {
-                        rb.AddForce(transform.up * 500);
+                        rb.AddForce(tran.up * 500);
                         jumped = 50;
                     }
                 }
@@ -60,62 +72,39 @@ public class PlayerController : MonoBehaviour
 
                 if (Input.GetKey(KeyCode.D))
                 {
-                    rb.AddForce(transform.right * speed);
+                    rb.AddForce(tran.right * speed);
                 }
                 else if (Input.GetKey(KeyCode.A))
                 {
-                    rb.AddForce(transform.right * -speed);
-                }
-                if (!gravObj.alignWithGravity)
-                {
-                    if (Input.GetKey(KeyCode.Q))
-                    {
-                        rb.AddTorque(rotation * 1);
-                    }
-                    else if (Input.GetKey(KeyCode.E))
-                    {
-                        rb.AddTorque(rotation * -1);
-                    }
-                    else if (rb.angularVelocity < -12)
-                    {
-                        rb.AddTorque(rotation);
-                    }
-                    else if (rb.angularVelocity > 12)
-                    {
-                        rb.AddTorque(-rotation);
-                    }
-                    else
-                    {
-                        rb.angularVelocity = 0;
-                    }
+                    rb.AddForce(tran.right * -speed);
                 }
             }
-            else
+            else if (inputMode >= InputMode.Space)
             {
                 if (Input.GetKey(KeyCode.D))
                 {
-                    rb.AddForce(transform.right * speed);
+                    rb.AddForce(tran.right * speed);
                 }
                 else if (Input.GetKey(KeyCode.A))
                 {
-                    rb.AddForce(transform.right * -speed);
+                    rb.AddForce(tran.right * -speed);
                 }
                 if (Input.GetKey(KeyCode.W))
                 {
-                    rb.AddForce(transform.up * speed);
+                    rb.AddForce(tran.up * speed);
                 }
                 else if (Input.GetKey(KeyCode.S))
                 {
-                    rb.AddForce(transform.up * -speed);
+                    rb.AddForce(tran.up * -speed);
                 }
 
                 if (Input.GetKey(KeyCode.Q))
                 {
-                    rb.AddTorque(rotation * 1);
+                    rb.AddTorque(rotation * speed/3);
                 }
                 else if (Input.GetKey(KeyCode.E))
                 {
-                    rb.AddTorque(rotation * -1);
+                    rb.AddTorque(rotation * speed/3);
                 }
                 else if (rb.angularVelocity < -12)
                 {
@@ -130,6 +119,10 @@ public class PlayerController : MonoBehaviour
                     rb.angularVelocity = 0;
                 }
             }
+            else if (inputMode == InputMode.Ship)
+            {
+
+            }
         }
 
         //} else
@@ -139,9 +132,9 @@ public class PlayerController : MonoBehaviour
               //  jumped -= 3;
             //}
         //}
-        //float dist = Vector3.Distance(transform.position, planet.position);
+        //float dist = Vector3.Distance(tran.position, planet.position);
         //float g = G * planet.mass / (dist * dist);
-        //Vector3 dir = planet.position - transform.position;
+        //Vector3 dir = planet.position - tran.position;
         //rb.AddForce(g * dir);
     }
 
@@ -159,15 +152,31 @@ public class PlayerController : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.R))
         {
-            if (jetpack)
+            if (inputMode == InputMode.Ground)
             {
-                jetpack = false;
+                inputMode = InputMode.Space;
+                gravObj.alignWithGravity = false;
+            }
+            else if (inputMode == InputMode.Space)
+            {
+                inputMode = InputMode.Ground;
                 gravObj.alignWithGravity = true;
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            if (inputMode != InputMode.Ship)
+            {
+                prevInput = inputMode;
+                inputMode = InputMode.Ship;
+                speed *= 10;
+                rb = ship;
             }
             else
             {
-                jetpack = true;
-                gravObj.alignWithGravity = false;
+                inputMode = prevInput;
+                speed /= 10;
+                rb = playerrb;
             }
         }
     }
@@ -178,11 +187,6 @@ public class PlayerController : MonoBehaviour
         {
             grounded = true;
         }
-        else
-        {
-            
-        }
-        
     }
     private void OnTriggerStay2D(Collider2D collision)
     {
@@ -210,6 +214,6 @@ public class PlayerController : MonoBehaviour
         angSpeed = Mathf.Clamp(angSpeed, -maxASpeed, maxASpeed);
         curAngle += angSpeed * Time.deltaTime; // apply the rotation to the angle...
                                                // and make the object follow the angle (must be modulo 360)
-        transform.rotation = Quaternion.Euler(0, 0, curAngle % 360);
+        tran.rotation = Quaternion.Euler(0, 0, curAngle % 360);
     }
 }
