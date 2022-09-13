@@ -7,10 +7,12 @@ public class PlayerController : MonoBehaviour
     Rigidbody2D rb;
     GravityObject gravObj;
     public Rigidbody2D ship;
+    Transform seat;
     //private new Collider2D collider;
     bool input = true;
     //const float G = 0.001f;
-    public float speed = 3;
+    public float baseSpeed = 20;
+    public float speed = 20;
     public bool grounded = false;
     public bool jetpack = false;
     public int jumped = 0;
@@ -42,6 +44,7 @@ public class PlayerController : MonoBehaviour
         rb = playerrb;
         gravObj = GetComponent<GravityObject>();
         tran = transform;
+        seat = ship.transform.GetChild(0);
         //collider = GetComponent<Collider2D>();
 
         targetAngle = tran.eulerAngles.z; // get the current angle just for start
@@ -100,28 +103,33 @@ public class PlayerController : MonoBehaviour
 
                 if (Input.GetKey(KeyCode.Q))
                 {
-                    rb.AddTorque(rotation * speed/3);
+                    rb.AddTorque(rotation * (speed * speed)/400);
                 }
                 else if (Input.GetKey(KeyCode.E))
                 {
-                    rb.AddTorque(rotation * speed/3);
+                    rb.AddTorque(-rotation * (speed * speed)/400);
                 }
                 else if (rb.angularVelocity < -12)
                 {
-                    rb.AddTorque(rotation);
+                    rb.AddTorque(rotation * (speed * speed) / 400);
                 }
                 else if (rb.angularVelocity > 12)
                 {
-                    rb.AddTorque(-rotation);
+                    rb.AddTorque(-rotation * (speed * speed) / 400);
                 }
                 else
                 {
                     rb.angularVelocity = 0;
                 }
             }
-            else if (inputMode == InputMode.Ship)
+            if (inputMode == InputMode.Ship)
             {
-
+                if (Input.GetKey(KeyCode.Space))
+                {
+                    rb.AddForce(tran.up * speed * 10);
+                }
+                playerrb.velocity = ship.velocity;
+                transform.SetPositionAndRotation(seat.position, seat.rotation);
             }
         }
 
@@ -169,13 +177,13 @@ public class PlayerController : MonoBehaviour
             {
                 prevInput = inputMode;
                 inputMode = InputMode.Ship;
-                speed *= 10;
+                speed = baseSpeed * 10;
                 rb = ship;
             }
             else
             {
                 inputMode = prevInput;
-                speed /= 10;
+                speed = baseSpeed;
                 rb = playerrb;
             }
         }

@@ -23,10 +23,10 @@ public class rocketeer : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (Input.GetKey(KeyCode.Space))
+        /*if (Input.GetKey(KeyCode.Space))
         {
             rb.AddForce(transform.up * speed);
-        }
+        }*/
         foreach (var obj in rbs)
         {
             obj.Key.GetComponent<PlayerController>()?.AlignWith(transform);

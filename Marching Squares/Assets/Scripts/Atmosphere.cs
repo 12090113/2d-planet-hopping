@@ -29,7 +29,7 @@ public class Atmosphere : MonoBehaviour
         {
             float dist = Vector2.Distance(transform.position, obj.Key.position);
             float dragcof = 1 - dist / radius;
-            Debug.Log(obj.Key.name + ": " + dist + " / " + radius + " = " + dragcof);
+            //Debug.Log(obj.Key.name + ": " + dist + " / " + radius + " = " + dragcof);
             Vector2 relativeVelocity = rb.velocity - obj.Key.velocity;
             Vector2 vector = relativeVelocity.sqrMagnitude * relativeVelocity.normalized * drag * dragcof;
             float num = Mathf.Min(vector.magnitude * Time.fixedDeltaTime, relativeVelocity.magnitude);
