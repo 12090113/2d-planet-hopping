@@ -75,7 +75,7 @@ public class OrbitDebugDisplay : MonoBehaviour {
 
         // Draw paths
         for (int bodyIndex = 0; bodyIndex < virtualBodies.Length; bodyIndex++) {
-            Random.InitState(bodies[bodyIndex].GetHashCode());
+            Random.InitState(bodies[bodyIndex].transform.GetSiblingIndex() + 1); // +1 for better colors because why not
             Color pathColour = Random.ColorHSV(0f, 1f, 1f, 1f, 0.75f, 1f);
             //if (bodies[bodyIndex].name.Equals("Player"))
             //{
