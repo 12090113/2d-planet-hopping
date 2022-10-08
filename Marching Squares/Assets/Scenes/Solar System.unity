@@ -5710,7 +5710,7 @@ SpriteShapeRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
+  m_DynamicOccludee: 0
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
@@ -16030,6 +16030,7 @@ GameObject:
   - component: {fileID: 1814419779}
   - component: {fileID: 1814419778}
   - component: {fileID: 1814419780}
+  - component: {fileID: 1814419781}
   m_Layer: 0
   m_Name: NbodySim
   m_TagString: Untagged
@@ -16049,8 +16050,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2082d2002a877b146849d065ac7768c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bodies: []
+  bodiesrb: []
   timeStep: 0.02
   usePhysicsTimeStep: 1
+  threads: 1
   shader: {fileID: 7200000, guid: 7cfdf8d3c89481d4a92d70d77f5aaddc, type: 3}
 --- !u!4 &1814419779
 Transform:
@@ -16087,6 +16091,27 @@ MonoBehaviour:
   width: 100
   useThickLines: 0
   drawLines: 1
+--- !u!114 &1814419781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1814419777}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4165e4df2c483b44b8f9264aa1a127f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numSteps: 10
+  timeStep: 1
+  usePhysicsTimeStep: 0
+  relativeToBody: 1
+  centralBody: {fileID: 562568292}
+  width: 100
+  useThickLines: 1
+  drawLines: 1
+  shader: {fileID: 7200000, guid: b9a96e533c82cdc428879549a196d532, type: 3}
 --- !u!1 &1880793630
 GameObject:
   m_ObjectHideFlags: 0

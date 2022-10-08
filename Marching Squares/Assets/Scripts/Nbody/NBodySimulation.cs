@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class NBodySimulation : MonoBehaviour
 {
-    GravityObject[] bodies;
-    Rigidbody2D[] bodiesrb;
+    public GravityObject[] bodies;
+    public Rigidbody2D[] bodiesrb;
     //static NBodySimulation instance;
     public float timeStep = 0.02f;
     public bool usePhysicsTimeStep = true;
 
-    int threads = 1;
+    public int threads = 1;
     public ComputeShader shader;
     public static ComputeBuffer pos_buf;
     //public static ComputeBuffer vel_buf;

@@ -1,13 +1,14 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSpredMain
 
-uniform RWStructuredBuffer<float3> position : register(u1);
-uniform RWStructuredBuffer<float3> velocity : register(u2);
+//uniform RWStructuredBuffer<float3> position : register(u1);
+//uniform RWStructuredBuffer<float3> velocity : register(u2);
 uniform RWStructuredBuffer<float> mass : register(u3);
 //uniform RWStructuredBuffer<float3> accel : register(u4);
-uniform RWStructuredBuffer<float3> predpositions : register(u1);
+uniform RWStructuredBuffer<float3> predposition : register(u5);
+uniform RWStructuredBuffer<float3> predvelocity : register(u6);
 uint num;
-uint numSteps;
+//uint numSteps;
 
 [numthreads(64,1,1)]
 void CSpredMain(uint3 id : SV_DispatchThreadID)
@@ -19,11 +20,11 @@ void CSpredMain(uint3 id : SV_DispatchThreadID)
 	// Iterate every "star".
 	for (uint i = 0; i < num; i++)
 	{
-		float dist = distance(position[i], position[threadnum]);
+		float dist = distance(predposition[i], predposition[threadnum]);
 		g = (mass[i] /* mass[threadnum]*/) / (dist * dist) * G;
 
 		// Direction vector. We add 1e-10 to avoid NaN when length == 0
-		float3 dir = position[i] - position[threadnum];
+		float3 dir = predposition[i] - predposition[threadnum];
 		dir = dir / (length(dir) + 1e-10);
 
 		float3 accel_;
@@ -36,5 +37,6 @@ void CSpredMain(uint3 id : SV_DispatchThreadID)
 
 	}
 
-	accel[threadnum] = t_accel;
+	predvelocity[threadnum] += t_accel;
+	predposition[threadnum] += predvelocity[threadnum];
 }

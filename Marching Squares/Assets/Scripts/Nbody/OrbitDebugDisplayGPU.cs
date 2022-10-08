@@ -11,26 +11,130 @@ public class OrbitDebugDisplayGPU : MonoBehaviour {
     public GravityObject centralBody;
     public float width = 100;
     public bool useThickLines;
+    public bool drawLines = true;
 
-    int threads = 1;
+    NBodySimulation sim;
     public ComputeShader shader;
     public static ComputeBuffer predpos_buf;
+    public static ComputeBuffer predvel_buf;
 
     void Start () {
         if (Application.isPlaying) {
             useThickLines = true;
         }
-        Shader.SetGlobalBuffer(Shader.PropertyToID("predpositions"), predpos_buf);
+        sim = FindObjectOfType<NBodySimulation>();
+        predpos_buf = new ComputeBuffer(sim.threads, 3 * sizeof(float));
+        predvel_buf = new ComputeBuffer(sim.threads, 3 * sizeof(float));
+        Shader.SetGlobalBuffer(Shader.PropertyToID("predposition"), predpos_buf);
+        Shader.SetGlobalBuffer(Shader.PropertyToID("predvelocity"), predpos_buf);
+        float[] pos_data = new float[sim.threads * 3];
+        float[] vel_data = new float[sim.threads * 3];
+
+        for (int i = 0; i < sim.bodies.Length; i++)
+        {
+            pos_data[i * 3 + 0] = sim.bodies[i].transform.position.x;
+            pos_data[i * 3 + 1] = sim.bodies[i].transform.position.y;
+            pos_data[i * 3 + 2] = sim.bodies[i].transform.position.z;
+            vel_data[i * 3 + 0] = sim.bodies[i].velocity.x;
+            vel_data[i * 3 + 1] = sim.bodies[i].velocity.y;
+            vel_data[i * 3 + 2] = sim.bodies[i].velocity.z;
+        }
     }
 
-    void Update () {
-        //if (!Application.isPlaying) {
+    void Update ()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            drawLines = !drawLines;
+            if (!drawLines) HideOrbits();
+        }
+        if (drawLines)
+        {
             DrawOrbitsGPU();
-        //}
+        }
     }
 
     void DrawOrbitsGPU() {
-        ;
+        var drawPoints = new Vector3[sim.bodies.Length][];
+        int referenceFrameIndex = 0;
+        Vector3 referenceBodyInitialPosition = Vector3.zero;
+
+        float[] pos_data = new float[sim.threads * 3];
+        float[] vel_data = new float[sim.threads * 3];
+
+        for (int i = 0; i < sim.bodies.Length; i++)
+        {
+            pos_data[i * 3 + 0] = sim.bodies[i].transform.position.x;
+            pos_data[i * 3 + 1] = sim.bodies[i].transform.position.y;
+            pos_data[i * 3 + 2] = sim.bodies[i].transform.position.z;
+            vel_data[i * 3 + 0] = sim.bodiesrb[i].velocity.x;
+            vel_data[i * 3 + 1] = sim.bodiesrb[i].velocity.y;
+            vel_data[i * 3 + 2] = 0;
+
+            drawPoints[i] = new Vector3[numSteps + 1];
+            drawPoints[i][0] = sim.bodies[i].transform.position;
+
+            if (sim.bodies[i] == centralBody && relativeToBody)
+            {
+                referenceFrameIndex = i;
+                referenceBodyInitialPosition = sim.bodies[i].transform.position;
+            }
+        }
+        predpos_buf.SetData(pos_data);
+        predvel_buf.SetData(pos_data);
+        for (int step = 1; step < numSteps + 1; step++)
+        {
+            Vector3 referenceBodyPosition = (relativeToBody) ? new Vector3(pos_data[referenceFrameIndex * 3], pos_data[referenceFrameIndex * 3 + 1], pos_data[referenceFrameIndex * 3 + 2]) : Vector3.zero;
+            shader.Dispatch(shader.FindKernel("CSpredMain"), 1, sim.threads / 64, 1);
+            predpos_buf.GetData(pos_data);
+            for (int i = 0; i < sim.bodies.Length; i++)
+            {
+                Vector3 pos = new Vector3(pos_data[i * 3], pos_data[i * 3 + 1], pos_data[i * 3 + 2]);
+                if (relativeToBody && i == referenceFrameIndex)
+                {
+                    pos = referenceBodyInitialPosition;
+                }
+                drawPoints[i][step] = pos;
+            }
+        }
+
+        for (int bodyIndex = 0; bodyIndex < sim.bodies.Length; bodyIndex++)
+        {
+            Random.InitState(sim.bodies[bodyIndex].transform.GetSiblingIndex() + 1); // +1 for better colors because why not
+            Color pathColour = Random.ColorHSV(0f, 1f, 1f, 1f, 0.75f, 1f);
+            //if (bodies[bodyIndex].name.Equals("Player"))
+            //{
+            //    pathColour = Color.black;
+            //}
+
+            if (useThickLines)
+            {
+                Debug.Log(drawPoints[bodyIndex][1].x);
+                var lineRenderer = sim.bodies[bodyIndex].gameObject.GetComponentInChildren<LineRenderer>();
+                lineRenderer.enabled = true;
+                lineRenderer.positionCount = drawPoints[bodyIndex].Length;
+                lineRenderer.SetPositions(drawPoints[bodyIndex]);
+                lineRenderer.startColor = pathColour;
+                lineRenderer.endColor = pathColour;
+                lineRenderer.widthMultiplier = width;
+            }
+            else
+            {
+                for (int i = 0; i < drawPoints[bodyIndex].Length - 1; i++)
+                {
+                    Debug.DrawLine(drawPoints[bodyIndex][i], drawPoints[bodyIndex][i + 1], pathColour);
+                }
+
+                // Hide renderer
+                var lineRenderer = sim.bodies[bodyIndex].gameObject.GetComponentInChildren<LineRenderer>();
+                if (lineRenderer)
+                {
+                    lineRenderer.enabled = false;
+                }
+            }
+
+        }
+
     }
 
     void DrawOrbits () {
@@ -77,7 +181,7 @@ public class OrbitDebugDisplayGPU : MonoBehaviour {
 
         // Draw paths
         for (int bodyIndex = 0; bodyIndex < virtualBodies.Length; bodyIndex++) {
-            Random.InitState(bodies[bodyIndex].GetHashCode());
+            Random.InitState(bodies[bodyIndex].transform.GetSiblingIndex() + 1); // +1 for better colors because why not
             Color pathColour = Random.ColorHSV(0f, 1f, 1f, 1f, 0.75f, 1f);
             //if (bodies[bodyIndex].name.Equals("Player"))
             //{
@@ -151,5 +255,11 @@ public class OrbitDebugDisplayGPU : MonoBehaviour {
                 velocity = body.velocity;
             mass = body.mass;
         }
+    }
+
+    void OnDestroy()
+    {
+        predpos_buf.Dispose();
+        predvel_buf.Dispose();
     }
 }
