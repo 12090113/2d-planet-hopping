@@ -78,13 +78,13 @@ public class NBodySimulation : MonoBehaviour
         accel_buf.GetData(accel_data);
         for (int i = 0; i < bodies.Length; i++)
         {
-            Vector3 num = Vector3.zero;
+            //Vector3 num = Vector3.zero;
             Vector2 accel = new Vector2(accel_data[i * 3], accel_data[i * 3 + 1]);
             bodiesrb[i].velocity += accel * timeStep;
             if (bodies[i].alignWithGravity)
             {
                 bodies[i].AlignWith(accel - bodiesrb[i].velocity);
-                GravityObject[] lessbodies = new GravityObject[bodies.Length - 1];
+                /*GravityObject[] lessbodies = new GravityObject[bodies.Length - 1];
                 for (int z = 0; z < bodies.Length -1; z++) {
                     int number = 0;
                     if (bodies[z].transform.name.Equals("Moon"))
@@ -97,7 +97,7 @@ public class NBodySimulation : MonoBehaviour
                         lessbodies[z-number] = bodies[z];
                     }
                 }
-                Debug.Log(CalculateAcceleration(i, lessbodies) + ", " + num + ", " + bodiesrb[i].velocity);
+                Debug.Log(CalculateAcceleration(i, lessbodies) + ", " + num + ", " + bodiesrb[i].velocity);*/
             }
             Vector3 pos = bodies[i].transform.position;
             pos_data[i * 3 + 0] = pos.x;
