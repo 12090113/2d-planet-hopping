@@ -10,6 +10,8 @@ public class NBodySimulation : MonoBehaviour
     public float timeStep = 0.02f;
     public bool usePhysicsTimeStep = true;
 
+    public const float G = 0.1f;
+
     public int threads = 1;
     public ComputeShader shader;
     public static ComputeBuffer pos_buf;
@@ -76,9 +78,27 @@ public class NBodySimulation : MonoBehaviour
         accel_buf.GetData(accel_data);
         for (int i = 0; i < bodies.Length; i++)
         {
-            bodiesrb[i].velocity += new Vector2(accel_data[i * 3], accel_data[i * 3 + 1]) * timeStep;
+            Vector3 num = Vector3.zero;
+            Vector2 accel = new Vector2(accel_data[i * 3], accel_data[i * 3 + 1]);
+            bodiesrb[i].velocity += accel * timeStep;
             if (bodies[i].alignWithGravity)
-                bodies[i].AlignWith(new Vector2(accel_data[i * 3], accel_data[i * 3 + 1]));
+            {
+                bodies[i].AlignWith(accel - bodiesrb[i].velocity);
+                GravityObject[] lessbodies = new GravityObject[bodies.Length - 1];
+                for (int z = 0; z < bodies.Length -1; z++) {
+                    int number = 0;
+                    if (bodies[z].transform.name.Equals("Moon"))
+                    {
+                        GravityObject[] array = { bodies[z] };
+                        num = CalculateAcceleration(i, array);
+                        number = -1;
+                    } else
+                    {
+                        lessbodies[z-number] = bodies[z];
+                    }
+                }
+                Debug.Log(CalculateAcceleration(i, lessbodies) + ", " + num + ", " + bodiesrb[i].velocity);
+            }
             Vector3 pos = bodies[i].transform.position;
             pos_data[i * 3 + 0] = pos.x;
             pos_data[i * 3 + 1] = pos.y;
@@ -93,5 +113,21 @@ public class NBodySimulation : MonoBehaviour
         //vel_buf.Dispose();
         mass_buf.Dispose();
         accel_buf.Dispose();
+    }
+
+    Vector3 CalculateAcceleration(int i, GravityObject[] bodies)
+    {
+        Vector3 acceleration = Vector3.zero;
+        for (int j = 0; j < bodies.Length; j++)
+        {
+            if (i == j)
+            {
+                continue;
+            }
+            Vector3 forceDir = (bodies[j].transform.position - bodies[i].transform.position).normalized;
+            float sqrDst = (bodies[j].transform.position - bodies[i].transform.position).sqrMagnitude;
+            acceleration += forceDir * G * bodies[j].mass / sqrDst;
+        }
+        return acceleration;
     }
 }
