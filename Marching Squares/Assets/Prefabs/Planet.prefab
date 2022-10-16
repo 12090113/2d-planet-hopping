@@ -673,6 +673,7 @@ GameObject:
   - component: {fileID: 3089971233965830654}
   - component: {fileID: 3089971233965830655}
   - component: {fileID: 3089971233965830652}
+  - component: {fileID: 2552415949849308627}
   m_Layer: 0
   m_Name: Planet
   m_TagString: Untagged
@@ -803,7 +804,7 @@ MonoBehaviour:
   - {x: 0, y: -0.5, z: 0}
   m_ShapePathHash: -946450987
   m_Mesh: {fileID: 0}
-  m_InstanceId: 28766
+  m_InstanceId: 60888
 --- !u!114 &3089971233965830651
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2990,6 +2991,22 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 0
+--- !u!114 &2552415949849308627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3089971233965830653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ac1258207d9adb4187d94a89dcb156e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gravObj: {fileID: 3089971233965830649}
+  centralBody: {fileID: 0}
+  massOffset: 0
+  orbit: 1
 --- !u!1 &3089971233987153758
 GameObject:
   m_ObjectHideFlags: 0

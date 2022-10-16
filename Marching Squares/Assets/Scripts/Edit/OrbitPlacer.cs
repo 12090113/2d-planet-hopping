@@ -5,14 +5,14 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class OrbitPlacer : MonoBehaviour
 {
-    GravityObject gravObj;
+    public GravityObject gravObj;
     public GravityObject centralBody;
     public float massOffset = 0;
     public bool orbit = true;
     // Start is called before the first frame update
     void Start()
     {
-        if (!Application.isPlaying)
+        if (Application.isPlaying)
         {
             orbit = false;
             return;
@@ -29,8 +29,22 @@ public class OrbitPlacer : MonoBehaviour
 
     void Orbit()
     {
+        if (gravObj == null)
+            gravObj = GetComponent<GravityObject>();
+        if (centralBody == null)
+        {
+            GravityObject[] list = FindObjectsOfType<GravityObject>();
+            GravityObject max = list[0];
+            for (int i = 0; i < list.Length; i++)
+            {
+                if (list[i].mass > max.mass && list[i] != gravObj)
+                {
+                    max = list[i];
+                }
+            }
+            centralBody = max;
+        }
         gravObj = GetComponent<GravityObject>();
-        Debug.Log("hi");
         Vector3 pos1 = gravObj.transform.position;
         Vector3 pos2 = centralBody.transform.position;
         Vector3 dir = Vector2.Perpendicular(pos1 - pos2).normalized;
