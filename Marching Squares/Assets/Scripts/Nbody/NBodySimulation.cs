@@ -83,7 +83,7 @@ public class NBodySimulation : MonoBehaviour
             bodiesrb[i].velocity += accel * timeStep;
             if (bodies[i].alignWithGravity)
             {
-                bodies[i].AlignWith(accel - bodiesrb[i].velocity);
+                bodies[i].AlignWith(accel.normalized - bodiesrb[i].velocity.normalized);
                 /*GravityObject[] lessbodies = new GravityObject[bodies.Length - 1];
                 for (int z = 0; z < bodies.Length -1; z++) {
                     int number = 0;

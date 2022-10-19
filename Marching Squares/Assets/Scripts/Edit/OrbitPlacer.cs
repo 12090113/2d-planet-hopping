@@ -39,9 +39,9 @@ public class OrbitPlacer : MonoBehaviour
     {
         if (gravObj == null)
             gravObj = GetComponent<GravityObject>();
+        GravityObject[] list = FindObjectsOfType<GravityObject>();
         if (centralBody == null)
         {
-            GravityObject[] list = FindObjectsOfType<GravityObject>();
             GravityObject max = list[0];
             for (int i = 0; i < list.Length; i++)
             {
@@ -51,6 +51,19 @@ public class OrbitPlacer : MonoBehaviour
                 }
             }
             centralBody = max;
+        }
+        float dist = (centralBody.transform.position - transform.position).magnitude;
+        massOffset = 0;
+        for (int i = 0; i < list.Length; i++)
+        {
+            if (list[i] != centralBody && list[i].mass > 1000f)
+            {
+                float dist2 = (centralBody.transform.position - list[i].transform.position).magnitude;
+                if (dist > dist2)
+                {
+                    massOffset += list[i].mass;
+                }
+            }
         }
         gravObj = GetComponent<GravityObject>();
         Vector3 pos1 = gravObj.transform.position;
