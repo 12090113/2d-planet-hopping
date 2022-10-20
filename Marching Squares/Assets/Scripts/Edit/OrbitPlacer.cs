@@ -6,7 +6,7 @@ using UnityEngine;
 public class OrbitPlacer : MonoBehaviour
 {
     public GravityObject gravObj;
-    public GravityObject centralBody;
+    public GravityObject[] centralBody;
     public float massOffset = 0;
     public Direction direction = Direction.Clockwise;
     public bool orbit = true;
@@ -42,6 +42,7 @@ public class OrbitPlacer : MonoBehaviour
         GravityObject[] list = FindObjectsOfType<GravityObject>();
         if (centralBody == null)
         {
+            centralBody = new GravityObject[1];
             GravityObject max = list[0];
             for (int i = 0; i < list.Length; i++)
             {
@@ -50,25 +51,45 @@ public class OrbitPlacer : MonoBehaviour
                     max = list[i];
                 }
             }
-            centralBody = max;
+            centralBody[0] = max;
         }
-        float dist = (centralBody.transform.position - transform.position).magnitude;
+        (Vector3, Vector3, float) center = Center();
+        Debug.Log(center);
+        Vector3 pos = center.Item1;
+        Vector3 vel = center.Item2;
+        float mass = center.Item3;
+        float dist = (pos - transform.position).magnitude;
         massOffset = 0;
         for (int i = 0; i < list.Length; i++)
         {
-            if (list[i] != centralBody && list[i].mass > 1000f)
+            if (list[i].mass > 1000f)
             {
-                float dist2 = (centralBody.transform.position - list[i].transform.position).magnitude;
+                float dist2 = (pos - list[i].transform.position).magnitude;
                 if (dist > dist2)
                 {
                     massOffset += list[i].mass;
                 }
             }
         }
+        massOffset -= mass;
         gravObj = GetComponent<GravityObject>();
         Vector3 pos1 = gravObj.transform.position;
-        Vector3 pos2 = centralBody.transform.position;
-        Vector3 dir = Vector2.Perpendicular(pos2 - pos1).normalized * (int)direction;
-        gravObj.velocity = Mathf.Sqrt(NBodySimulation.G * (centralBody.mass + massOffset) / Vector3.Distance(pos1, pos2)) * dir + centralBody.velocity;
+        Vector3 dir = Vector2.Perpendicular(pos - pos1).normalized * (int)direction;
+        gravObj.velocity = Mathf.Sqrt(NBodySimulation.G * (mass + massOffset) / Vector3.Distance(pos1, pos)) * dir + vel;
+    }
+
+    (Vector3, Vector3, float) Center()
+    {
+        Vector3 centerOfMass = Vector3.zero;
+        float totalMass = 0f;
+        Vector3 totalVelocity = Vector3.zero;
+        foreach (GravityObject body in centralBody)
+        {
+            centerOfMass += body.transform.position * body.mass;
+            totalMass += body.mass;
+            totalVelocity += body.velocity;
+        }
+        centerOfMass /= totalMass;
+        return (centerOfMass, totalVelocity, totalMass);
     }
 }
